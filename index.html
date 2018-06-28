@@ -1,0 +1,122 @@
+<html>
+
+<head>
+    
+
+    <meta name=viewport content='width=700'>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta Author="arjunbazinga"
+    <meta topics="Reinforcement learning, humans, AI,">
+</head>
+<title>How do "you" model people</title>
+
+<body>
+    <style>
+        body {
+                margin: auto;
+                background: #fffde8;
+                padding: 10px;
+            }
+            ::-moz-selection {
+                background: yellow;
+            }
+            ::selection {
+                background: yellow;
+            }    
+    </style>
+    <div>
+        <h2>How do "you" model people?</h2>
+    </div>
+
+    <div>
+        Introdutction  text
+    </div>
+    <br>
+    <br>
+    <div style="display:inline-block">
+        <div>
+            Pick an Agent:<br>
+            <input type="radio" Name="Agent" id="Agent1" checked>Agent 1</input><br>
+            <input type="radio" Name="Agent" id="Agent2">Agent 2</input><br>
+            <input type="radio" Name="Agent" id="Agent3">Agent 3</input><br>
+        </div>
+
+
+    </div>
+
+    <br>
+
+    <div stle="padding:50px position: relative margin: auto height: 10vh width: 10vw">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div>
+        Select a box:
+        <input type="button" id="box1" value="Box 1">
+        <input type="button" id="box2" value="Box 2">
+        
+        <div id="probs", style="display:none">
+                Predicted probs:
+                <div id="p"></div>
+            </div>
+    </div>
+
+
+
+    <br>
+    <div>
+        <input type="button" id="reset" value="Reset Everything">
+        <br>
+        <div id="revealed" style="display:none">
+            <p>
+                Agent 1 is Random it puts the reward in the two boxes with equal probability.
+                <br> Agent 2 is Evil or, as the cool kids say it Adversarial, it tries to guess which box you're going to click
+                and then puts the reward in the other box.
+                <br> Agent 3 is Good, it tries to put the reward in the box it thinks you're goning to click.
+                <br>
+            </p>
+
+            <p>
+                So how do Agent 2 and 3 predict what you're going to click on ?
+                <br> This implementation closely follows the paper
+                <a href="https://arxiv.org/abs/1711.09883">
+                    AI Safety Gridworlds</a> in which the authors use simple 
+                <a href="https://en.wikipedia.org/wiki/">Exponential Smoothing</a> to assing probabilities 
+                to each box.
+
+                Try adjusting the learning rate here:
+                <input type="number" id="lr" , value=0.25>
+                <input type="button" , id="lrc" , value="Update">
+                <br> <br>
+                You'll see the closer you are to 1 the more the prediction will be affected by what happend in the recent
+                past.<br><br>
+
+                After calculating the probabilities the Good agent just selects the box with the higher probability and the Evil agent does the opposite.
+
+                This simple enviroment is supposed to test how your RL algorithms works with different kinds of agents.
+                Watch this video to learn more about the
+                <a href="https://www.youtube.com/watch?v=WM2THPzFSNk">friend or foe</a> enviroment, which inspired this website.
+                
+
+            </p>
+
+        </div>
+        <br>
+        <input type="button" id="reveal" value="Reveal the Secret">
+    </div>
+    <br>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script src="fof.min.js"></script>
+    <script>reset()</script>
+
+
+
+
+</body>
+
+</html>
