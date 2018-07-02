@@ -22,7 +22,7 @@
     <meta Author="arjunbazinga"
     <meta topics="Reinforcement learning, humans, AI,">
 </head>
-<title>How do "you" model people</title>
+<title>How do "you" model people ?</title>
 
 <body>
     <style>
@@ -36,14 +36,30 @@
             }
             ::selection {
                 background: yellow;
-            }    
+            }
+            textarea{
+                margin: auto;
+                min-width: 95%;
+                max-width: 100%;
+                min-height: 20%;
+                border-radius: 6px;
+                box-shadow: 2px 2px 8px rgba(black, .3);
+                border: 1
+            } 
     </style>
     <div>
-        <h2>How do "you" model people?</h2>
+        <h2>How do "you" model people ?</h2>
     </div>
 
     <div>
-        Introdutction  text
+        <br>
+        Here is a game you can play to figure out how you "model" people.<br>
+
+        Play each agent for as many turns as you like.<br>
+        On every turn the agent will put a reward in one of the boxes and a penalty in the other<br>
+        Your job then is to guess which box has the reward, and hence collect as much reward as you can.<br>
+        
+        <b>Hint</b>: For each agent try coming up with a strategy to achieve a big average reward.<br>
     </div>
     <br>
     <br>
@@ -80,6 +96,10 @@
     <div>
         <input type="button" id="reset" value="Reset Everything">
         <br>
+        <br>
+        I <b>strongly</b> recommend filling the box below before clicking  Reveal.<br> <br>
+        <textarea id="des"></textarea>
+        <br>
         <div id="revealed" style="display:none">
             <p>
                 Agent 1 is Random it puts the reward in the two boxes with equal probability.
@@ -95,25 +115,25 @@
                 <a href="https://arxiv.org/abs/1711.09883">
                     AI Safety Gridworlds</a> in which the authors use simple 
                 <a href="https://en.wikipedia.org/wiki/">Exponential Smoothing</a> to assing probabilities 
-                to each box.
+                to each box.<br>
 
                 Try adjusting the learning rate here:
                 <input type="number" id="lr" , value=0.25>
                 <input type="button" , id="lrc" , value="Update">
-                <br> <br>
-                You'll see the closer you are to 1 the more the prediction will be affected by what happend in the recent
+                <br>
+                You'll see the closer the learning rate is to 1 the more the prediction will be affected by what happend in the recent
                 past.<br><br>
 
                 After calculating the probabilities the Good agent just selects the box with the higher probability and the Evil agent does the opposite.
 
-                This simple enviroment is supposed to test how your RL algorithms modles different kinds of agents, it encounters.
+                This simple enviroment is supposed to test how different RL algorithms modle different kinds of agents.
 
                 
 
             </p>
-
+            <br>
         </div>
-        <br>
+        
         <input type="button" id="reveal" value="Reveal">
     </div>
     <br>

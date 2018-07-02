@@ -25,6 +25,7 @@ function reset() {
     document.getElementById("revealed").style.display = "none"
     document.getElementById("reveal").style.display = "block"
     document.getElementById("probs").style.display = "none"
+    document.getElementById("des").value = "Describe how you think each agent works."
 }
 
 function choose(agent, probs) {
