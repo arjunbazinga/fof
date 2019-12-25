@@ -27,25 +27,39 @@
 <body>
     <style>
         body {
-                margin: auto;
-                background: #fffde8;
-                padding: 10px;
+            margin: auto;
+            background: #fffde8;
+            padding: 10px;
+        }
+        ::-moz-selection {
+            background: yellow;
+        }
+        ::selection {
+            background: yellow;
+        }
+        textarea{
+            margin: auto;
+            min-width: 95%;
+            max-width: 100%;
+            min-height: 20%;
+            border-radius: 6px;
+            box-shadow: 2px 2px 8px rgba(black, .3);
+            border: 1
+        } 
+
+        @media (prefers-color-scheme: light) {
+            body {
+            background-color: #fffde8;
+            color: black;
             }
-            ::-moz-selection {
-                background: yellow;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+              background-color: black;
+              color: #fffde8;
             }
-            ::selection {
-                background: yellow;
-            }
-            textarea{
-                margin: auto;
-                min-width: 95%;
-                max-width: 100%;
-                min-height: 20%;
-                border-radius: 6px;
-                box-shadow: 2px 2px 8px rgba(black, .3);
-                border: 1
-            } 
+        }
     </style>
     <div>
         <h2>How do "you" model people ?</h2>
