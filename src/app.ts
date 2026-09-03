@@ -95,6 +95,7 @@ export class App {
   private render(): void {
     this.screen = this.build();
     this.root.replaceChildren(this.screen.node);
+    document.title = `${this.session.beat.label} · Friend or Foe`;
     // Move the reader to the new beat, but never steal focus on first paint.
     if (this.started) focusHeading(this.screen.node);
   }

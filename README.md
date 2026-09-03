@@ -59,8 +59,23 @@ pin the behaviours that make the game worth playing — sticking beats the frien
 every turn, alternating loses to it every turn, tracking `argmin` beats the foe
 every turn, and a coin holds the foe to zero.
 
-Deployed to GitHub Pages by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
-on push to `master`.
+Checks run on every pull request
+([`ci.yml`](.github/workflows/ci.yml)); `master` builds and deploys to GitHub
+Pages ([`deploy.yml`](.github/workflows/deploy.yml)).
+
+Tests run in four layers, because bugs have shown up in all of them: the
+engine's behaviour, the beat table's contracts, a whole playthrough driven
+through the DOM-free session, and the screens themselves in jsdom.
+
+Targets browsers from 2022 onward — it uses `:focus-visible`, `dvh` units and
+`replaceChildren`, so Safari 15.4+, Chrome 105+, Firefox 121+. No polyfills, no
+third-party requests, and nothing is collected about you: the only thing stored
+is a flag saying you have played before, so a repeat visit can offer to skip
+the intro.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
 
 ## `legacy/`
 

@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "description": "A playable version of the Friend or Foe environment from AI Safety Gridworlds.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -12,6 +16,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "jsdom": "^30.0.1",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
     "vitest": "^2.1.4"

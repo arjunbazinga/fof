@@ -63,6 +63,7 @@ function staticScreen(
   const sh = shell(s, parts.opponent);
   return {
     node: frame({
+      title: s.beat.label,
       label: sh.label,
       chip: sh.chip.node,
       stage: parts.stage,
@@ -89,6 +90,7 @@ function playable(
   const box: Boxes = boxes((c) => a.tap(c));
   return {
     node: frame({
+      title: s.beat.label,
       label: sh.label,
       chip: sh.chip.node,
       stage: parts.stage,

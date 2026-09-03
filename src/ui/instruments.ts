@@ -38,14 +38,20 @@ export function beliefBar(caption: string): BeliefBar {
   const fill = el('i');
   const left = el('span', { class: 'l' });
   const right = el('span', { class: 'r' });
-  const bar = el('div', { class: 'bar' }, fill, left, right);
+  // The two readouts are decoration for anyone hearing the page; the bar
+  // itself carries a sentence with the number in it.
+  left.setAttribute('aria-hidden', 'true');
+  right.setAttribute('aria-hidden', 'true');
+  const bar = el('div', { class: 'bar', role: 'img' }, fill, left, right);
   return {
     node: el('div', { class: 'group' }, el('span', { class: 'label', text: caption }), bar),
     set(belief, moved = false) {
       const pct = belief[0] * 100;
+      const side = pct >= 50 ? 'left' : 'right';
       fill.style.width = `${pct.toFixed(1)}%`;
       left.textContent = `LEFT ${Math.round(pct)}%`;
       right.textContent = `${Math.round(100 - pct)}% RIGHT`;
+      bar.setAttribute('aria-label', `${caption} ${side}, ${Math.round(Math.max(pct, 100 - pct))} percent`);
       if (!moved) return;
       // Restart the pulse: under reduced motion it is the only thing left
       // saying that this tap is what moved the bar.
@@ -124,12 +130,14 @@ export function progress(done: number, total: number, act: number): HTMLElement 
 }
 
 /** The one focusable landmark per screen, so a reader lands on the new beat. */
-export function heading(text: string, size: 'lg' | 'sm' | 'big' = 'lg'): HTMLElement {
+export function heading(text: string, size: 'lg' | 'sm' | 'big' | 'sr' = 'lg'): HTMLElement {
   const suffix = size === 'lg' ? '' : ` ${size}`;
   return el('h1', { class: `ask${suffix}`, tabindex: '-1' }, text);
 }
 
 export interface FrameParts {
+  /** Names the beat. Becomes the heading on screens that show no visible one. */
+  title: string;
   label: HTMLElement;
   chip: HTMLElement;
   stage: (Node | null)[];
@@ -137,12 +145,24 @@ export interface FrameParts {
   flush?: boolean;
 }
 
-export function frame({ label, chip, stage, bottom, flush }: FrameParts): HTMLElement {
+export function frame({ title, label, chip, stage, bottom, flush }: FrameParts): HTMLElement {
+  const content = stage.filter(Boolean) as Node[];
+  // A heading can be nested inside a group, so look through the subtree --
+  // checking only the top level silently produces a second one.
+  const hasHeading = content.some(
+    (n) => n instanceof HTMLElement && (n.classList.contains('ask') || n.querySelector('.ask') !== null),
+  );
   return el(
     'div',
     { class: 'enter' },
     el('header', { class: 'top' }, label, chip),
-    el('main', { class: `stage${flush ? ' flush' : ''}` }, ...(stage.filter(Boolean) as Node[])),
+    el(
+      'main',
+      { class: `stage${flush ? ' flush' : ''}` },
+      // Every screen gets exactly one heading, whether or not it shows one.
+      ...(hasHeading ? [] : [heading(title, 'sr')]),
+      ...content,
+    ),
     el('div', { class: 'bottom' }, ...(bottom.filter(Boolean) as Node[])),
   );
 }
