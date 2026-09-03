@@ -191,7 +191,10 @@ body {
   padding: 30px 8px;
   min-height: 92px;
   cursor: pointer;
-  transition: background var(--step) ease, color var(--step) ease, border-color var(--step) ease;
+  transition: none;
+}
+.box.reward, .box.empty {
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
 }
 .box:disabled { cursor: default; }
 .box:not(:disabled):active { transform: translateY(1px); }
@@ -266,6 +269,20 @@ body {
 .strip b.w { background: var(--win); border-color: var(--win); color: var(--on-accent); }
 .strip b.l { background: var(--miss); border-color: var(--miss); color: var(--on-accent); }
 .strip b.now { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ---------- the replay figure ---------- */
+
+.aligned-figure { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.aligned-figure .axis {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; color: var(--muted);
+}
+.aligned-figure .axis + .trace { margin-top: -4px; }
+.aligned-figure input[type='range'] { margin: 8px 0 0; }
+.trace svg { display: block; width: 100%; height: 88px; }
+
+/* Equal columns, so a cell sits under its own point on the trace above. */
+.strip.aligned { gap: 2px; }
+.strip.aligned b { flex: 1; min-width: 0; width: auto; }
 
 /* ---------- controls ---------- */
 

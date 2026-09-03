@@ -5,7 +5,7 @@
  * successor in another, inside `advance()`. Splitting a beat's definition
  * across two places is how a journey drifts out of sync with itself.
  */
-import type { Opponent } from './engine';
+import type { Opponent } from '../engine';
 
 export type Phase =
   | 'act1'
@@ -43,10 +43,10 @@ export const BEATS: Record<Phase, Beat> = {
   act2: { label: 'Round two', play: { opponent: 'foe', taps: 12, belief: false }, next: 'notice', act: 2 },
   notice: { label: 'Something changed', next: 'reveal', act: 2 },
   reveal: { label: 'Its head', play: { opponent: 'foe', taps: 8, belief: true }, next: 'replay', act: 2 },
-  replay: { label: 'Replay', next: 'act3', flush: true, act: 2 },
+  replay: { label: 'Replay', next: 'act3', act: 2 },
 
   // Act three. Unpredictability, just learned, is now exactly wrong.
-  act3: { label: 'Green room', play: { opponent: 'friend', taps: 8, belief: true }, next: 'debrief', act: 3 },
+  act3: { label: 'Round three', play: { opponent: 'friend', taps: 8, belief: true }, next: 'debrief', act: 3 },
   debrief: { label: 'Debrief', flush: true, act: 3 },
 
   // Past the credits.

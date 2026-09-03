@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BEATS, JOURNEY, RESOLVE_MS, TAP_THROUGH_AFTER_MS, type Phase } from '../src/journey';
+import { BEATS, JOURNEY, RESOLVE_MS, TAP_THROUGH_AFTER_MS, type Phase } from '../src/journey/beats';
 
 describe('the journey table', () => {
   it('only points at beats that exist', () => {
