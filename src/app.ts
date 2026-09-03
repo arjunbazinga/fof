@@ -514,7 +514,7 @@ export class App {
             html: 'This is the <b>friend or foe</b> environment from <a href="https://arxiv.org/abs/1711.09883">AI Safety Gridworlds</a> (Leike et al., 2017), §2.2.3. Each room hides the reward using an exponentially smoothed estimate of your next tap — the friend puts it where you are most likely to go, the foe where you are least likely, and the white room never looks at you at all.',
           }),
           el('p', {
-            html: 'The paper calls it the suite\u2019s only partially observable environment, "since the environment\u2019s memory is not observed by the agent." That memory is the bar. Hidden, the best you can do against the red room is break even by being unreadable. Shown, the foe is deterministic and you can win every single round — which is the part worth remembering: an adversary is only unbeatable to someone who refuses to model it.',
+            html: 'The paper calls it the suite\u2019s only partially observable environment, \u201Csince the environment\u2019s memory is not observed by the agent.\u201D That memory is the bar. Hidden, the best you can do against the red room is break even by being unreadable. Shown, the foe is deterministic and you can win every single round — which is the part worth remembering: an adversary is only unbeatable to someone who refuses to model it.',
           }),
           el('p', {
             html: 'When DeepMind ran this, Rainbow solved the red room by learning to walk into a wall until random exploration knocked it sideways, then collapsed once that randomness was annealed away. A2C found a stochastic policy and nearly solved all three rooms.',
