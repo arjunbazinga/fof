@@ -151,7 +151,7 @@ body {
   min-height: 0;
 }
 
-.stage.top { justify-content: flex-start; }
+.stage.flush { justify-content: flex-start; }
 
 .ask {
   font-family: var(--display);
@@ -189,7 +189,9 @@ body {
 }
 .box:disabled { cursor: default; }
 .box:not(:disabled):active { transform: translateY(1px); }
-.box .mark { display: block; font-size: 20px; line-height: 1; margin-bottom: 7px; }
+.box .mark { display: block; margin: 0 auto 8px; width: 20px; height: 20px; }
+.box .mark rect { fill: none; stroke: currentColor; stroke-width: 2; }
+.box .mark .half { fill: currentColor; stroke: none; }
 .box .state {
   display: block;
   font-family: var(--mono);

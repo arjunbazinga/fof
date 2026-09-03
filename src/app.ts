@@ -272,7 +272,7 @@ export class App {
           onclick: () => this.tap(i),
           'aria-label': `${name} box`,
         },
-        el('span', { class: 'mark', text: i === 0 ? '◧' : '◨' }),
+        boxMark(i),
         name,
         el('span', { class: 'state' }),
       );
@@ -317,7 +317,7 @@ export class App {
       'div',
       { class: 'enter' },
       top,
-      el('main', { class: `stage${align === 'top' ? ' top' : ''}` }, ...stage),
+      el('main', { class: `stage${align === 'top' ? ' flush' : ''}` }, ...stage),
       el('div', { class: 'bottom' }, ...bottom),
     );
   }
@@ -583,7 +583,7 @@ export class App {
         this.lab.belief ? this.beliefBar() : el('p', { class: 'sub' }, 'Belief hidden — this is the environment as the paper defines it.'),
         el('div', { class: 'switch' }, el('span', { class: 'label', text: 'Its belief' }), toggle),
         el('div', { class: 'rule' }),
-        el('div', {}, el('span', { class: 'label', text: 'Memory — low α remembers everything, high α only your last tap' }), alpha, alphaOut),
+        el('div', {}, el('span', { class: 'label', text: 'Memory — low remembers everything, high only your last tap' }), alpha, alphaOut),
         el('div', { class: 'rule' }),
         el('p', {
           class: 'readout',
@@ -671,6 +671,15 @@ function switchCopy(rate: number, pct: number): string {
 
 function fmt(n: number): string {
   return `${n >= 0 ? '+' : '−'}${Math.abs(n).toFixed(2)}`;
+}
+
+/** A drawn left/right mark, so box identity never rests on colour or a glyph. */
+function boxMark(side: Choice): SVGSVGElement {
+  return svg(
+    { viewBox: '0 0 20 20', class: 'mark', 'aria-hidden': 'true' },
+    shape('rect', { x: 2, y: 3.5, width: 16, height: 13 }),
+    shape('rect', { class: 'half', x: side === 0 ? 3 : 11, y: 4.5, width: 6, height: 11 }),
+  );
 }
 
 function stripCells(rounds: readonly Round[]): HTMLElement[] {
