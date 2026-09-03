@@ -1,0 +1,19 @@
+{
+  "name": "friend-or-foe",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A playable version of the Friend or Foe environment from AI Safety Gridworlds.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  }
+}
