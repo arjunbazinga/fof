@@ -17,9 +17,10 @@ import {
   type Boxes,
 } from './instruments';
 import { COPY } from '../journey/copy';
-import type { Phase } from '../journey/beats';
+import { JOURNEY, type Phase } from '../journey/beats';
 import type { Session } from '../journey/session';
-import { CEILING, summarise, type Choice, type Opponent, type Round } from '../engine';
+import { hasPlayed, rememberPlayed } from '../storage';
+import { CEILING, OPPONENTS, summarise, type Choice, type Opponent, type Round } from '../engine';
 
 export interface Screen {
   node: HTMLElement;
@@ -43,12 +44,31 @@ export interface Actions {
 /** Chrome every screen shares: the beat's label, its score chip, its progress. */
 function shell(s: Session, opponent?: Opponent) {
   const c = chip();
-  c.set(summarise(s.chipRounds()), s.run.rounds.length > 0);
+  const show = () => c.set(summarise(s.chipRounds()), s.run.rounds.length > 0);
+  show();
+  const act = s.beat.act;
   return {
     chip: c,
     label: roomLabel(s.beat.label, opponent),
-    progress: progress(s.phase),
-    refresh: () => c.set(summarise(s.chipRounds()), s.run.rounds.length > 0),
+    progress: act ? progress(JOURNEY.indexOf(s.phase), JOURNEY.length, act) : null,
+    refresh: show,
+  };
+}
+
+/** The common shape of a beat the player only reads. */
+function staticScreen(
+  s: Session,
+  parts: { stage: (Node | null)[]; bottom: (Node | null)[]; opponent?: Opponent },
+): Screen {
+  const sh = shell(s, parts.opponent);
+  return {
+    node: frame({
+      label: sh.label,
+      chip: sh.chip.node,
+      stage: parts.stage,
+      bottom: [...parts.bottom, sh.progress],
+      flush: s.beat.flush,
+    }),
   };
 }
 
@@ -92,7 +112,7 @@ export function actOne(s: Session, a: Actions): Screen {
   const rows = strip();
   rows.set(s.rounds());
   const note = el('p', { class: 'sub', text: COPY.actOne.note });
-  const returning = first && localStorage.getItem('fof.seen');
+  const returning = first && hasPlayed();
   return playable(
     s,
     a,
@@ -109,7 +129,6 @@ export function actOne(s: Session, a: Actions): Screen {
 }
 
 export function commit(s: Session, a: Actions): Screen {
-  const sh = shell(s);
   const cta = el('button', { class: 'cta', type: 'button', disabled: true }, COPY.commit.cta);
   let picked: string | null = null;
   const cards = COPY.guesses.map((g) =>
@@ -130,14 +149,10 @@ export function commit(s: Session, a: Actions): Screen {
     ),
   );
   cta.addEventListener('click', () => picked && a.commit(picked));
-  return {
-    node: frame({
-      label: sh.label,
-      chip: sh.chip.node,
-      stage: [heading(COPY.commit.ask, 'sm'), el('div', { class: 'cards' }, ...cards)],
-      bottom: [cta, el('p', { class: 'sub centre' }, COPY.commit.sub), sh.progress],
-    }),
-  };
+  return staticScreen(s, {
+    stage: [heading(COPY.commit.ask, 'sm'), el('div', { class: 'cards' }, ...cards)],
+    bottom: [cta, el('p', { class: 'sub centre' }, COPY.commit.sub)],
+  });
 }
 
 // ---------------------------------------------------------------- act two
@@ -171,7 +186,6 @@ export function actTwo(s: Session, a: Actions): Screen {
 }
 
 export function notice(s: Session, a: Actions): Screen {
-  const sh = shell(s);
   const recent = s.run.rounds.slice(-12);
   const lost = recent.filter((r) => !r.win).length;
   const won = recent.length - lost;
@@ -181,31 +195,21 @@ export function notice(s: Session, a: Actions): Screen {
       : won >= 10
         ? COPY.notice.won(won, recent.length)
         : COPY.notice.mixed(won, lost, recent.length);
-  return {
-    node: frame({
-      label: sh.label,
-      chip: sh.chip.node,
-      stage: [heading(head), el('p', { class: 'sub' }, sub)],
-      bottom: [
-        el('button', { class: 'cta', type: 'button', onclick: () => a.goto('reveal') }, COPY.notice.cta),
-        sh.progress,
-      ],
-    }),
-  };
+  return staticScreen(s, {
+    stage: [heading(head), el('p', { class: 'sub' }, sub)],
+    bottom: [el('button', { class: 'cta', type: 'button', onclick: () => a.goto('reveal') }, COPY.notice.cta)],
+  });
 }
 
 export function reveal(s: Session, a: Actions): Screen {
-  const bar = beliefBar(COPY.reveal.caption);
+  const bar = beliefBar(COPY.beliefCaption);
   bar.set(s.run.beliefs.foe);
   const note = el('p', { class: 'sub', text: COPY.reveal.note });
   return playable(
     s,
     a,
     { stage: [heading(COPY.reveal.ask, 'sm'), bar.node, note], opponent: 'foe', bar },
-    () => {
-      // One nudge, and only for a player stuck with the answer in front of them.
-      if (s.rounds().length === 4 && summarise(s.rounds()).score < 0) note.textContent = COPY.reveal.hint;
-    },
+    () => applyHint(s, note),
   );
 }
 
@@ -215,7 +219,6 @@ export function reveal(s: Session, a: Actions): Screen {
  * is the entire point of the screen.
  */
 export function replay(s: Session, a: Actions): Screen {
-  const sh = shell(s, 'foe');
   const foe = s.run.history('foe');
   const beliefs = foe.map((r) => r.belief[0]);
   const chart = el('div', { class: 'trace' });
@@ -241,59 +244,53 @@ export function replay(s: Session, a: Actions): Screen {
   scrub.addEventListener('input', draw);
   draw();
 
-  return {
-    node: frame({
-      label: sh.label,
-      chip: sh.chip.node,
-      stage: [
-        heading(COPY.replay.ask, 'sm'),
-        el(
-          'figure',
-          { class: 'aligned-figure', 'aria-label': stripLabel(foe) },
-          el('span', { class: 'label', text: COPY.replay.beliefLabel }),
-          // LEFT above and RIGHT below: these name the trace's vertical axis,
-          // and side by side they read as if they named the horizontal one.
-          el('span', { class: 'axis', text: 'LEFT' }),
-          chart,
-          el('span', { class: 'axis', text: 'RIGHT' }),
-          el('span', { class: 'label', text: COPY.replay.choiceLabel }),
-          rowsHost,
-          scrub,
-        ),
-        caption,
-      ],
-      bottom: [
-        el('button', { class: 'cta', type: 'button', onclick: () => a.goto('act3') }, COPY.replay.cta),
-        sh.progress,
-      ],
-    }),
-  };
+  return staticScreen(s, {
+    opponent: 'foe',
+    stage: [
+      heading(COPY.replay.ask, 'sm'),
+      el(
+        'figure',
+        { class: 'aligned-figure', 'aria-label': stripLabel(foe) },
+        el('span', { class: 'label', text: COPY.replay.beliefLabel }),
+        // LEFT above and RIGHT below: these name the trace's vertical axis,
+        // and side by side they read as if they named the horizontal one.
+        el('span', { class: 'axis', text: 'LEFT' }),
+        chart,
+        el('span', { class: 'axis', text: 'RIGHT' }),
+        el('span', { class: 'label', text: COPY.replay.choiceLabel }),
+        rowsHost,
+        scrub,
+      ),
+      caption,
+    ],
+    bottom: [el('button', { class: 'cta', type: 'button', onclick: () => a.goto('act3') }, COPY.replay.cta)],
+  });
 }
 
 // ---------------------------------------------------------------- act three
 
 export function actThree(s: Session, a: Actions): Screen {
-  const bar = beliefBar(COPY.reveal.caption);
+  const bar = beliefBar(COPY.beliefCaption);
   bar.set(s.run.beliefs.friend);
   const note = el('p', { class: 'sub', text: COPY.actThree.note });
   return playable(
     s,
     a,
     { stage: [heading(COPY.actThree.ask, 'sm'), bar.node, note], opponent: 'friend', bar },
-    () => {
-      if (s.rounds().length === 4 && summarise(s.rounds()).score < 2) note.textContent = COPY.actThree.hint;
-    },
+    () => applyHint(s, note),
   );
 }
 
+/** The order the player met them, not the order the engine lists them. */
+const AS_MET: Opponent[] = ['neutral', 'foe', 'friend'];
+
 export function debrief(s: Session, a: Actions): Screen {
-  localStorage.setItem('fof.seen', '1');
-  const sh = shell(s);
+  rememberPlayed();
   const all = summarise(s.run.rounds);
   const picked = COPY.guesses.find((g) => g.id === s.guess);
   const pct = Math.round(all.switchRate * 100);
 
-  const rows = (['neutral', 'foe', 'friend'] as Opponent[]).map((o) => {
+  const rows = AS_MET.map((o) => {
     const stats = summarise(s.run.history(o));
     return el(
       'div',
@@ -303,44 +300,39 @@ export function debrief(s: Session, a: Actions): Screen {
     );
   });
 
-  return {
-    node: frame({
-      label: sh.label,
-      chip: sh.chip.node,
-      stage: [
+  return staticScreen(s, {
+    stage: [
+      el(
+        'div',
+        { class: 'group' },
+        el('span', { class: 'label', text: COPY.debrief.switchLabel }),
+        heading(`${pct}%`, 'big'),
+        switchGauge(all.switchRate),
+        el('p', { class: 'sub', text: COPY.debrief.switched(all.switchRate, pct) }),
+      ),
+      el('div', { class: 'rule' }),
+      el(
+        'div',
+        { class: 'group' },
+        el('span', { class: 'label', text: COPY.debrief.guessLabel }),
         el(
           'div',
-          { class: 'group' },
-          el('span', { class: 'label', text: COPY.debrief.switchLabel }),
-          heading(`${pct}%`, 'big'),
-          switchGauge(all.switchRate),
-          el('p', { class: 'sub', text: COPY.debrief.switched(all.switchRate, pct) }),
+          { class: `card ${picked?.right ? 'right' : 'wrong'}` },
+          `“${picked?.text ?? 'nothing'}” — ${picked?.right ? 'right' : 'wrong'}`,
         ),
-        el('div', { class: 'rule' }),
-        el(
-          'div',
-          { class: 'group' },
-          el('span', { class: 'label', text: COPY.debrief.guessLabel }),
-          el(
-            'div',
-            { class: `card ${picked?.right ? 'right' : 'wrong'}` },
-            `“${picked?.text ?? 'nothing'}” — ${picked?.right ? 'right' : 'wrong'}`,
-          ),
-          el('p', { class: 'sub' }, COPY.debrief.rule),
-        ),
-        el('div', { class: 'rule' }),
-        el('div', { class: 'group' }, el('span', { class: 'label', text: COPY.debrief.ceilingLabel }), ...rows),
-        el('div', { class: 'rule' }),
-        el('div', { class: 'prose' }, ...COPY.debrief.paper.map((html) => el('p', { html }))),
-      ],
-      bottom: [
-        el('button', { class: 'cta', type: 'button', onclick: () => a.goto('lab') }, COPY.debrief.lab),
-        el('button', { class: 'ghost', type: 'button', onclick: () => a.startBlind() }, COPY.debrief.blind),
-        el('p', { class: 'credit', html: COPY.debrief.credit }),
-      ],
-      flush: true,
-    }),
-  };
+        el('p', { class: 'sub' }, COPY.debrief.rule),
+      ),
+      el('div', { class: 'rule' }),
+      el('div', { class: 'group' }, el('span', { class: 'label', text: COPY.debrief.ceilingLabel }), ...rows),
+      el('div', { class: 'rule' }),
+      el('div', { class: 'prose' }, ...COPY.debrief.paper.map((html) => el('p', { html }))),
+    ],
+    bottom: [
+      el('button', { class: 'cta', type: 'button', onclick: () => a.goto('lab') }, COPY.debrief.lab),
+      el('button', { class: 'ghost', type: 'button', onclick: () => a.startBlind() }, COPY.debrief.blind),
+      el('p', { class: 'credit', html: COPY.debrief.credit }),
+    ],
+  });
 }
 
 // ---------------------------------------------------------------- past the credits
@@ -350,7 +342,7 @@ export function lab(s: Session, a: Actions): Screen {
   const seg = el(
     'div',
     { class: 'seg', role: 'group', 'aria-label': 'Opponent' },
-    ...(['friend', 'neutral', 'foe'] as Opponent[]).map((k) =>
+    ...OPPONENTS.map((k) =>
       el('button', { type: 'button', 'aria-pressed': String(k === o), onclick: () => a.setOpponent(k) }, k),
     ),
   );
@@ -363,7 +355,7 @@ export function lab(s: Session, a: Actions): Screen {
     alphaOut.innerHTML = `<b>α ${Number(alpha.value).toFixed(2)}</b>`;
   });
 
-  const bar = s.lab.belief ? beliefBar(COPY.reveal.caption) : null;
+  const bar = s.lab.belief ? beliefBar(COPY.beliefCaption) : null;
   bar?.set(s.run.beliefs[o]);
   const rows = strip();
   rows.set(s.rounds());
@@ -424,48 +416,43 @@ export function blind(s: Session, a: Actions): Screen {
 }
 
 export function verdict(s: Session, a: Actions): Screen {
-  const sh = shell(s);
-  return {
-    node: frame({
-      label: sh.label,
-      chip: sh.chip.node,
-      stage: [
-        heading(COPY.blind.verdictAsk, 'sm'),
-        el(
-          'div',
-          { class: 'cards' },
-          ...(['friend', 'neutral', 'foe'] as Opponent[]).map((k) =>
-            el(
-              'button',
-              { class: 'card', type: 'button', onclick: () => a.callIt(k) },
-              k === 'neutral' ? 'Neither — it was random' : `The ${k}`,
-            ),
+  return staticScreen(s, {
+    stage: [
+      heading(COPY.blind.verdictAsk, 'sm'),
+      el(
+        'div',
+        { class: 'cards' },
+        ...OPPONENTS.map((k) =>
+          el(
+            'button',
+            { class: 'card', type: 'button', onclick: () => a.callIt(k) },
+            k === 'neutral' ? 'Neither — it was random' : `The ${k}`,
           ),
         ),
-      ],
-      bottom: [],
-    }),
-  };
+      ),
+    ],
+    bottom: [],
+  });
 }
 
 export function called(s: Session, a: Actions, pick: Opponent): Screen {
-  const sh = shell(s);
-  const right = pick === s.hidden;
-  return {
-    node: frame({
-      label: sh.label,
-      chip: sh.chip.node,
-      stage: [
-        heading(right ? COPY.blind.right : COPY.blind.wrong),
-        el('p', { class: 'sub', html: `It was the <b>${s.hidden}</b>. ${COPY.tell[s.hidden]}` }),
-        choiceStrip(s.blindRounds()),
-      ],
-      bottom: [
-        el('button', { class: 'cta', type: 'button', onclick: () => a.startBlind() }, COPY.blind.again),
-        el('button', { class: 'ghost', type: 'button', onclick: () => a.goto('lab') }, COPY.blind.back),
-      ],
-    }),
-  };
+  return staticScreen(s, {
+    stage: [
+      heading(pick === s.hidden ? COPY.blind.right : COPY.blind.wrong),
+      el('p', { class: 'sub', html: `It was the <b>${s.hidden}</b>. ${COPY.tell[s.hidden]}` }),
+      choiceStrip(s.blindRounds()),
+    ],
+    bottom: [
+      el('button', { class: 'cta', type: 'button', onclick: () => a.startBlind() }, COPY.blind.again),
+      el('button', { class: 'ghost', type: 'button', onclick: () => a.goto('lab') }, COPY.blind.back),
+    ],
+  });
+}
+
+/** The beat decides whether a nudge is due; the screen only shows it. */
+function applyHint(s: Session, note: HTMLElement): void {
+  const hint = s.hint();
+  if (hint) note.textContent = hint;
 }
 
 function fmt(n: number): string {

@@ -76,3 +76,27 @@ describe('a session', () => {
     expect(summarise(s.chipRounds()).taps).toBe(0);
   });
 });
+
+describe('the nudge', () => {
+  it('arrives on the beat’s chosen tap, and only for a player who is losing', () => {
+    const s = new Session(new Run(4));
+    s.goto('reveal');
+    const hint = BEATS.reveal.hint!;
+    for (let i = 0; i < hint.after - 1; i++) {
+      s.tap(0);
+      expect(s.hint()).toBeNull();
+    }
+    s.tap(0); // sticking against the foe loses, so the nudge is due
+    expect(s.hint()).toBe(hint.text);
+    s.tap(0);
+    expect(s.hint(), 'it should not repeat').toBeNull();
+  });
+
+  it('stays quiet for a player who has already worked it out', () => {
+    const s = new Session(new Run(4));
+    s.goto('reveal');
+    // Tracking the foe's argmin wins every round, so there is nothing to say.
+    for (let i = 0; i < BEATS.reveal.hint!.after; i++) s.tap(s.run.peek('foe'));
+    expect(s.hint()).toBeNull();
+  });
+});

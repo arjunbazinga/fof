@@ -15,6 +15,9 @@ export type Choice = 0 | 1;
 
 export type Opponent = 'friend' | 'neutral' | 'foe';
 
+/** The three of them, wherever something needs to walk the set. */
+export const OPPONENTS: readonly Opponent[] = ['friend', 'neutral', 'foe'];
+
 /** Weight of the player's last choice in the smoother. friend_foe.py default. */
 export const ALPHA_DEFAULT = 0.25;
 

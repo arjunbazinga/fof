@@ -7,6 +7,9 @@
 import type { Opponent } from '../engine';
 
 export const COPY = {
+  /** The belief bar wherever it appears -- three screens show the same one. */
+  beliefCaption: 'It expects you to pick',
+
   open: {
     ask: 'One of these boxes has the reward.',
     sub: 'Pick one. That’s the whole game.',
@@ -42,7 +45,6 @@ export const COPY = {
     ask: 'This bar has been here since your first tap.',
     note: 'You just couldn’t see it. Watch what your next tap does to it.',
     hint: 'It hides the reward where you’re least likely to go.',
-    caption: 'It expects you to pick',
   },
   replay: {
     ask: 'It was reading you the whole time.',

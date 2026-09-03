@@ -8,8 +8,7 @@
  * screen that had already been replaced.
  */
 import { el, focus } from './dom';
-import { boxMark, choiceStrip, stripLabel } from './figures';
-import { BEATS, JOURNEY, type Phase } from '../journey/beats';
+import { boxMark, stripCells, stripLabel } from './figures';
 import type { Belief, Choice, Round, Stats } from '../engine';
 
 export interface Chip {
@@ -104,21 +103,23 @@ export function strip(limit = 24): Strip {
     node,
     set(rounds) {
       const recent = rounds.slice(-limit);
-      node.replaceChildren(...choiceStrip(recent).children);
+      node.replaceChildren(...stripCells(recent));
       node.setAttribute('aria-label', stripLabel(recent));
     },
   };
 }
 
-/** Where the player is, so the guided run never feels unbounded. */
-export function progress(phase: Phase): HTMLElement | null {
-  const act = BEATS[phase].act;
-  if (!act) return null;
-  const done = JOURNEY.indexOf(phase);
+/**
+ * Where the player is, so the guided run never feels unbounded.
+ *
+ * Told its position rather than looking it up: an instrument should not need
+ * to know the story to draw itself.
+ */
+export function progress(done: number, total: number, act: number): HTMLElement {
   return el(
     'div',
     { class: 'progress', role: 'img', 'aria-label': `Part ${act} of 3` },
-    ...JOURNEY.map((_, i) => el('i', { class: i <= done ? 'on' : '' })),
+    ...Array.from({ length: total }, (_, i) => el('i', { class: i <= done ? 'on' : '' })),
   );
 }
 

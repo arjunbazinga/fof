@@ -5,7 +5,7 @@
  * so a whole playthrough can be driven and asserted in a test, and so the
  * screens can be pure functions of it.
  */
-import { Run, type Choice, type Opponent, type Round } from '../engine';
+import { OPPONENTS, Run, type Choice, type Opponent, type Round } from '../engine';
 import { BEATS, type Beat, type Phase } from './beats';
 
 export class Session {
@@ -50,18 +50,23 @@ export class Session {
     return this.run.rounds.slice(this.blindMark);
   }
 
-  /**
-   * What the score chip counts. An interstitial reports the round the player
-   * just finished -- otherwise "You lost 8 of the last 12" can sit beside a
-   * cheerful running total and undercut its own headline.
-   */
+  /** Whatever this beat says the chip counts. */
   chipRounds(): Round[] {
-    if (this.phase === 'lab') return this.run.history(this.lab.opponent);
-    if (this.phase === 'verdict') return this.blindRounds();
-    // The replay screen draws every foe tap, so the chip counts them too.
-    if (this.phase === 'replay') return this.run.history('foe');
-    if (this.phase === 'debrief') return this.run.rounds;
-    return this.rounds();
+    switch (this.beat.counts ?? 'beat') {
+      case 'run': return this.run.rounds;
+      case 'foeHistory': return this.run.history('foe');
+      case 'blindRound': return this.blindRounds();
+      case 'labOpponent': return this.run.history(this.lab.opponent);
+      case 'beat': return this.rounds();
+    }
+  }
+
+  /** The nudge this beat offers, if the player has earned it. */
+  hint(): string | null {
+    const hint = this.beat.hint;
+    if (!hint || this.rounds().length !== hint.after) return null;
+    const score = this.rounds().reduce((n, r) => n + (r.win ? 1 : -1), 0);
+    return score < hint.scoreBelow ? hint.text : null;
   }
 
   tapsLeft(): number {
@@ -87,8 +92,7 @@ export class Session {
   }
 
   startBlind(pick = Math.random()): void {
-    const pool: Opponent[] = ['friend', 'neutral', 'foe'];
-    this.hidden = pool[Math.floor(pick * pool.length)];
+    this.hidden = OPPONENTS[Math.floor(pick * OPPONENTS.length)];
     this.run.beliefs[this.hidden] = [0.5, 0.5];
     this.goto('blind');
     this.blindMark = this.mark;

@@ -47,3 +47,26 @@ describe('the journey table', () => {
     expect(TAP_THROUGH_AFTER_MS).toBeLessThan(RESOLVE_MS);
   });
 });
+
+describe('what a beat declares about itself', () => {
+  it('gives every hint something to say and a moment to say it', () => {
+    for (const [name, beat] of Object.entries(BEATS)) {
+      if (!beat.hint) continue;
+      expect(beat.hint.text, name).toBeTruthy();
+      expect(beat.hint.after, name).toBeGreaterThan(0);
+      expect(beat.hint.after, `${name} would nudge after the beat has ended`).toBeLessThan(
+        beat.play?.taps ?? 0,
+      );
+    }
+  });
+
+  it('only counts something other than its own rounds where that is the point', () => {
+    const special = Object.entries(BEATS).filter(([, b]) => b.counts);
+    expect(Object.fromEntries(special.map(([k, b]) => [k, b.counts]))).toEqual({
+      replay: 'foeHistory',
+      debrief: 'run',
+      lab: 'labOpponent',
+      verdict: 'blindRound',
+    });
+  });
+});

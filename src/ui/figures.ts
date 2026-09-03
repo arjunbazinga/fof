@@ -26,17 +26,22 @@ export interface StripOptions {
   at?: number;
 }
 
+/** The cells alone, for a strip that is refilled in place. */
+export function stripCells(rounds: readonly Round[], opts: StripOptions = {}): HTMLElement[] {
+  return rounds.map((r, i) =>
+    el(
+      'b',
+      { class: `${r.win ? 'w' : 'l'}${opts.at === i + 1 ? ' now' : ''}`, 'aria-hidden': 'true' },
+      r.choice === 0 ? 'L' : 'R',
+    ),
+  );
+}
+
 export function choiceStrip(rounds: readonly Round[], opts: StripOptions = {}): HTMLElement {
   return el(
     'div',
     { class: `strip${opts.aligned ? ' aligned' : ''}`, role: 'img', 'aria-label': stripLabel(rounds) },
-    ...rounds.map((r, i) =>
-      el(
-        'b',
-        { class: `${r.win ? 'w' : 'l'}${opts.at === i + 1 ? ' now' : ''}`, 'aria-hidden': 'true' },
-        r.choice === 0 ? 'L' : 'R',
-      ),
-    ),
+    ...stripCells(rounds, opts),
   );
 }
 

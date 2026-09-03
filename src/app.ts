@@ -12,6 +12,21 @@ import { RESOLVE_MS, RESOLVE_MS_REDUCED, TAP_THROUGH_AFTER_MS, type Phase } from
 import { Session } from './journey/session';
 import { summarise, type Choice, type Opponent } from './engine';
 
+/** Every beat's builder. Typed by Phase, so a new beat cannot go unrendered. */
+const SCREENS: Record<Phase, (s: Session, a: Actions) => Screen> = {
+  act1: screens.actOne,
+  commit: screens.commit,
+  act2: screens.actTwo,
+  notice: screens.notice,
+  reveal: screens.reveal,
+  replay: screens.replay,
+  act3: screens.actThree,
+  debrief: screens.debrief,
+  lab: screens.lab,
+  blind: screens.blind,
+  verdict: screens.verdict,
+};
+
 export class App {
   private root: HTMLElement;
   private session = new Session();
@@ -85,22 +100,8 @@ export class App {
   }
 
   private build(): Screen {
-    const s = this.session;
-    const a = this.actions;
-    if (this.called) return screens.called(s, a, this.called);
-    switch (s.phase) {
-      case 'act1': return screens.actOne(s, a);
-      case 'commit': return screens.commit(s, a);
-      case 'act2': return screens.actTwo(s, a);
-      case 'notice': return screens.notice(s, a);
-      case 'reveal': return screens.reveal(s, a);
-      case 'replay': return screens.replay(s, a);
-      case 'act3': return screens.actThree(s, a);
-      case 'debrief': return screens.debrief(s, a);
-      case 'lab': return screens.lab(s, a);
-      case 'blind': return screens.blind(s, a);
-      case 'verdict': return screens.verdict(s, a);
-    }
+    if (this.called) return screens.called(this.session, this.actions, this.called);
+    return SCREENS[this.session.phase](this.session, this.actions);
   }
 
   private tap(choice: Choice): void {
