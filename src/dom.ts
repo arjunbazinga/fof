@@ -52,3 +52,8 @@ export function trace(values: readonly number[], w: number, h: number, pad = 3):
 }
 
 export const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** Move the reader to a new beat without scrolling the page under them. */
+export function focus(node: HTMLElement): void {
+  node.focus({ preventScroll: true });
+}
