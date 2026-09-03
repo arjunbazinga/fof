@@ -329,6 +329,20 @@ button:disabled { opacity: 0.4; cursor: default; }
 .card.right { border-color: var(--win); }
 .card.wrong { border-color: var(--miss); }
 
+input.own {
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  padding: 13px 16px;
+  font-family: var(--body);
+  font-size: 16px; /* anything smaller and iOS zooms the viewport on focus */
+  color: var(--ink);
+  background: var(--raise);
+  border: 1.5px solid var(--accent);
+  border-radius: 0;
+}
+input.own::placeholder { color: var(--muted); }
+
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); }
 .seg button {
   appearance: none;

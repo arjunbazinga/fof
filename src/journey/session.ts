@@ -13,7 +13,10 @@ export class Session {
   phase: Phase = 'act1';
   /** Where the current beat's rounds start in the transcript. */
   mark = 0;
+  /** Which offered guess they tapped, or 'other' when they wrote their own. */
   guess: string | null = null;
+  /** Their own words, when they wrote some. */
+  guessText = '';
   /** The opponent blind mode is hiding, and where that round began. */
   hidden: Opponent = 'foe';
   blindMark = 0;

@@ -12,33 +12,38 @@ export const COPY = {
 
   open: {
     ask: 'One of these boxes has the reward.',
-    sub: 'Pick one. That’s the whole game.',
+    // The premise is true and the ambiguity in it is the game: a rule can be
+    // fixed and still not be independent of what you do. Nobody is told which
+    // kind this is -- that is the thing to discover.
+    sub: 'Each round it follows a fixed rule. Work it out and score as high as you can.',
     skip: 'Played before — skip to the lab',
   },
   actOne: {
     note: 'Green means you found it.',
   },
   commit: {
-    ask: 'Before you go on — what’s deciding where the reward goes?',
+    ask: 'Before you go on — what’s the rule?',
     cta: 'Lock it in',
-    sub: 'You’ll be scored on this at the end.',
+    sub: 'You’ll see this again at the end.',
+    /** Chosen when none of the offered guesses fits. Opens a blank line. */
+    otherLabel: 'Something else',
+    otherPlaceholder: 'In your own words',
   },
   actTwo: {
     caption: 'Your score, this round',
     note: 'Same two boxes.',
   },
   notice: {
-    cta: 'Show me why',
+    cta: 'Show me round two’s rule',
     // Read from the transcript, because a player who alternates in phase
     // actually beats the foe and must not be told they were losing.
-    lost: (n: number, of: number) => [`You lost ${n} of the last ${of}.`, 'Still a coin?'],
-    won: (n: number, of: number) => [
-      `You won ${n} of the last ${of}.`,
-      'That wasn’t luck. You found its rule without meaning to.',
-    ],
-    mixed: (won: number, lost: number, of: number) => [
-      `Your last ${of}: ${won} up, ${lost} down.`,
-      'Whatever that was, it wasn’t a coin.',
+    // Report the round. Do not draw the conclusion for them -- naming what it
+    // was not is most of the way to naming what it was.
+    lost: (n: number, of: number) => [`You lost ${n} of the last ${of}.`, 'Round two is over.'],
+    won: (n: number, of: number) => [`You won ${n} of the last ${of}.`, 'Round two is over.'],
+    mixed: (won: number, lost: number) => [
+      `Round two: ${won} up, ${lost} down.`,
+      'That was a different rule from round one.',
     ],
   },
   reveal: {
@@ -61,12 +66,12 @@ export const COPY = {
   },
   debrief: {
     switchLabel: 'Your switch rate',
-    guessLabel: 'You guessed',
+    guessLabel: 'Your answer, before round two',
     ceilingLabel: 'Yours vs. the best a memoryless player can do',
     lab: 'Open the lab',
     blind: 'Blind mode — name the room from behaviour alone',
     credit: 'First built in 2017 by <a href="https://twitter.com/arjunsriv">@arjunsriv</a>.',
-    rule: 'All three rooms ran one rule: a smoothed estimate of your next tap. The only input was you.',
+    rule: 'Every round ran the same kind of rule, and it was fixed — it just was not fixed in the way the word suggests. Each one placed the reward from a smoothed estimate of your next tap. The only thing it read was you.',
     switched: (rate: number, pct: number) =>
       rate > 0.58
         ? `A fair coin switches half the time. You switched ${pct}% — the over-alternating the red room feeds on.`
@@ -95,11 +100,15 @@ export const COPY = {
     again: 'Again',
     back: 'Back to the lab',
   },
+  /**
+   * Three hypotheses a player actually forms, all of them wrong, and a blank.
+   * Offering "something reacting to me" as a fourth option handed over the
+   * whole game before they had played a single round of round two.
+   */
   guesses: [
-    { id: 'coin', text: 'A fair coin', right: false },
-    { id: 'biased', text: 'A coin, but biased', right: false },
-    { id: 'pattern', text: 'A fixed pattern I could learn', right: false },
-    { id: 'me', text: 'Something reacting to me', right: true },
+    { id: 'coin', text: 'A coin flip, fifty-fifty' },
+    { id: 'biased', text: 'A coin, but it favours one box' },
+    { id: 'sequence', text: 'A sequence that repeats' },
   ],
   room: { friend: 'Green room', neutral: 'White room', foe: 'Red room' } as Record<Opponent, string>,
   tell: {

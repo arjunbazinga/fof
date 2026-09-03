@@ -33,7 +33,7 @@ export interface Screen {
 export interface Actions {
   tap(choice: Choice): void;
   goto(phase: Phase): void;
-  commit(id: string): void;
+  commit(id: string, text?: string): void;
   startBlind(): void;
   callIt(pick: Opponent): void;
   setOpponent(opponent: Opponent): void;
@@ -133,7 +133,26 @@ export function actOne(s: Session, a: Actions): Screen {
 export function commit(s: Session, a: Actions): Screen {
   const cta = el('button', { class: 'cta', type: 'button', disabled: true }, COPY.commit.cta);
   let picked: string | null = null;
-  const cards = COPY.guesses.map((g) =>
+
+  const own = el('input', {
+    type: 'text',
+    class: 'own',
+    hidden: true,
+    maxlength: '140',
+    placeholder: COPY.commit.otherPlaceholder,
+    'aria-label': COPY.commit.otherLabel,
+    autocomplete: 'off',
+  }) as HTMLInputElement;
+
+  const ready = () => {
+    cta.disabled = picked === null || (picked === 'other' && own.value.trim() === '');
+  };
+  own.addEventListener('input', ready);
+
+  // "Something else" is a blank, not a fourth hypothesis. Offering the answer
+  // as an option is the same as telling them.
+  const choices = [...COPY.guesses.map((g) => ({ id: g.id, text: g.text })), { id: 'other', text: COPY.commit.otherLabel }];
+  const cards = choices.map((c) =>
     el(
       'button',
       {
@@ -141,18 +160,21 @@ export function commit(s: Session, a: Actions): Screen {
         type: 'button',
         'aria-pressed': 'false',
         onclick: (e: Event) => {
-          picked = g.id;
-          cards.forEach((c) => c.setAttribute('aria-pressed', 'false'));
+          picked = c.id;
+          cards.forEach((card) => card.setAttribute('aria-pressed', 'false'));
           (e.currentTarget as HTMLElement).setAttribute('aria-pressed', 'true');
-          cta.disabled = false;
+          own.hidden = c.id !== 'other';
+          if (c.id === 'other') own.focus();
+          ready();
         },
       },
-      g.text,
+      c.text,
     ),
   );
-  cta.addEventListener('click', () => picked && a.commit(picked));
+
+  cta.addEventListener('click', () => picked && a.commit(picked, own.value.trim()));
   return staticScreen(s, {
-    stage: [heading(COPY.commit.ask, 'sm'), el('div', { class: 'cards' }, ...cards)],
+    stage: [heading(COPY.commit.ask, 'sm'), el('div', { class: 'cards' }, ...cards, own)],
     bottom: [cta, el('p', { class: 'sub centre' }, COPY.commit.sub)],
   });
 }
@@ -196,7 +218,7 @@ export function notice(s: Session, a: Actions): Screen {
       ? COPY.notice.lost(lost, recent.length)
       : won >= 10
         ? COPY.notice.won(won, recent.length)
-        : COPY.notice.mixed(won, lost, recent.length);
+        : COPY.notice.mixed(won, lost);
   return staticScreen(s, {
     stage: [heading(head), el('p', { class: 'sub' }, sub)],
     bottom: [el('button', { class: 'cta', type: 'button', onclick: () => a.goto('reveal') }, COPY.notice.cta)],
@@ -290,6 +312,7 @@ export function debrief(s: Session, a: Actions): Screen {
   rememberPlayed();
   const all = summarise(s.run.rounds);
   const picked = COPY.guesses.find((g) => g.id === s.guess);
+  const answer = s.guess === 'other' ? s.guessText : (picked?.text ?? 'nothing');
   const pct = Math.round(all.switchRate * 100);
 
   const rows = AS_MET.map((o) => {
@@ -317,11 +340,9 @@ export function debrief(s: Session, a: Actions): Screen {
         'div',
         { class: 'group' },
         el('span', { class: 'label', text: COPY.debrief.guessLabel }),
-        el(
-          'div',
-          { class: `card ${picked?.right ? 'right' : 'wrong'}` },
-          `“${picked?.text ?? 'nothing'}” — ${picked?.right ? 'right' : 'wrong'}`,
-        ),
+        // Their own words go back unjudged; a canned guess was one of three
+        // wrong ones, and can be told so.
+        el('div', { class: `card${picked ? ' wrong' : ''}` }, `“${answer}”`),
         el('p', { class: 'sub' }, COPY.debrief.rule),
       ),
       el('div', { class: 'rule' }),

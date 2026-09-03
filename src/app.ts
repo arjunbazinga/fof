@@ -42,8 +42,9 @@ export class App {
   private actions: Actions = {
     tap: (choice) => this.tap(choice),
     goto: (phase) => this.goto(phase),
-    commit: (id) => {
+    commit: (id, text = '') => {
       this.session.guess = id;
+      this.session.guessText = text;
       this.session.advance();
       this.render();
     },

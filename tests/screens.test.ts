@@ -101,10 +101,49 @@ describe('the commitment gate', () => {
     cta.click();
     expect(committed).toEqual([]);
 
-    node.querySelectorAll<HTMLButtonElement>('.card')[3].click();
+    node.querySelectorAll<HTMLButtonElement>('.card')[0].click();
     expect(cta.disabled).toBe(false);
     cta.click();
-    expect(committed).toEqual(['me']);
+    expect(committed).toEqual(['coin']);
+  });
+
+  it('never offers the answer as one of the options', () => {
+    // Handing over "something reacting to me" as a tappable card told the
+    // player the thing the whole game exists for them to discover.
+    const text = [...screens.commit(played('commit'), actions()).node.querySelectorAll('.card')]
+      .map((c) => c.textContent!.toLowerCase())
+      .join(' | ');
+    expect(text).not.toMatch(/react|respond|watch|me\b|my |predict|adapt/);
+    expect(text).toContain('something else');
+  });
+
+  it('opens a blank line for an answer we did not offer, and needs words in it', () => {
+    const committed: [string, string | undefined][] = [];
+    const node = screens.commit(played('commit'), actions({ commit: (id, t) => committed.push([id, t]) })).node;
+    const cta = node.querySelector<HTMLButtonElement>('button.cta')!;
+    const own = node.querySelector<HTMLInputElement>('input.own')!;
+    expect(own.hidden).toBe(true);
+
+    const cards = node.querySelectorAll<HTMLButtonElement>('.card');
+    cards[cards.length - 1].click();
+    expect(own.hidden).toBe(false);
+    expect(cta.disabled, 'a blank blank is not an answer').toBe(true);
+
+    own.value = 'it puts it where I did not go last time';
+    own.dispatchEvent(new Event('input'));
+    expect(cta.disabled).toBe(false);
+    cta.click();
+    expect(committed).toEqual([['other', 'it puts it where I did not go last time']]);
+  });
+
+  it('hides the blank line again if they change their mind', () => {
+    const node = screens.commit(played('commit'), actions()).node;
+    const cards = node.querySelectorAll<HTMLButtonElement>('.card');
+    const own = node.querySelector<HTMLInputElement>('input.own')!;
+    cards[cards.length - 1].click();
+    expect(own.hidden).toBe(false);
+    cards[0].click();
+    expect(own.hidden).toBe(true);
   });
 
   it('marks only the chosen answer', () => {
@@ -113,6 +152,24 @@ describe('the commitment gate', () => {
     cards[1].click();
     cards[2].click();
     expect([...cards].map((c) => c.getAttribute('aria-pressed'))).toEqual(['false', 'false', 'true', 'false']);
+  });
+});
+
+describe('the debrief', () => {
+  it('gives back the player’s own words rather than grading them', () => {
+    const s = played('debrief');
+    s.guess = 'other';
+    s.guessText = 'it goes wherever I am not looking';
+    const card = screens.debrief(s, actions()).node.querySelector('.card')!;
+    expect(card.textContent).toContain('it goes wherever I am not looking');
+    expect(card.classList.contains('wrong'), 'their own words are not marked wrong').toBe(false);
+  });
+
+  it('does mark one of the three offered guesses, since all three are wrong', () => {
+    const s = played('debrief');
+    s.guess = 'sequence';
+    const card = screens.debrief(s, actions()).node.querySelector('.card')!;
+    expect(card.classList.contains('wrong')).toBe(true);
   });
 });
 

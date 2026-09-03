@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { BEATS, JOURNEY, RESOLVE_MS, TAP_THROUGH_AFTER_MS, type Phase } from '../src/journey/beats';
+import { COPY } from '../src/journey/copy';
 
 describe('the journey table', () => {
   it('only points at beats that exist', () => {
@@ -68,5 +69,24 @@ describe('what a beat declares about itself', () => {
       lab: 'labOpponent',
       verdict: 'blindRound',
     });
+  });
+});
+
+describe('what the player is told before they discover it', () => {
+  it('states the premise without naming the mechanism', () => {
+    const upfront = [COPY.open.ask, COPY.open.sub, COPY.commit.ask, ...COPY.guesses.map((g) => g.text)]
+      .join(' ')
+      .toLowerCase();
+    // "Fixed" is true and is the whole trap: a rule can be fixed and still not
+    // be independent of what you do. Saying so outright ends the game.
+    expect(upfront).toContain('fixed rule');
+    expect(upfront).not.toMatch(/react|respond|predict|adapt|watch(ing|es)?\b|reads? you/);
+  });
+
+  it('does not conclude on the player’s behalf at the turn', () => {
+    const interstitial = [...COPY.notice.lost(8, 12), ...COPY.notice.won(11, 12), ...COPY.notice.mixed(6, 6)]
+      .join(' ')
+      .toLowerCase();
+    expect(interstitial).not.toMatch(/wasn’t a coin|still a coin|found its rule|luck/);
   });
 });
