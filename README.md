@@ -73,6 +73,17 @@ third-party requests, and nothing is collected about you: the only thing stored
 is a flag saying you have played before, so a repeat visit can offer to skip
 the intro.
 
+## What it is for
+
+[`docs/product.md`](docs/product.md) is the decision record — the goal, the
+measure and its target band, the non-goals, and the rule that governs every
+line of copy shown before the reveal. Read it before changing a beat.
+
+The short version: **a person should leave having felt, not been told, that
+their own behaviour was the environment's input.** A change that makes this
+more fun, more faithful, or more beautiful while weakening that sentence is a
+bad change.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
