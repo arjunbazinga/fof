@@ -79,10 +79,12 @@ the intro.
 measure and its target band, the non-goals, and the rule that governs every
 line of copy shown before the reveal. Read it before changing a beat.
 
-The short version: **a person should leave having felt, not been told, that
-their own behaviour was the environment's input.** A change that makes this
-more fun, more faithful, or more beautiful while weakening that sentence is a
-bad change.
+The short version: **a person should come away knowing how little an agent is
+given to work with — by being given exactly that much themselves, and noticing
+how fast, or how slowly, they learn from it.** The friend-or-foe feedback loop
+is what happens to be hard to learn in this particular room; it is an instance,
+not the point. A change that makes this more fun, more faithful, or more
+beautiful while weakening that sentence is a bad change.
 
 ## Licence
 
