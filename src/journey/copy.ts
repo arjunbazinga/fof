@@ -70,7 +70,9 @@ export const COPY = {
     ceilingLabel: 'Yours vs. the best a memoryless player can do',
     lab: 'Open the lab',
     blind: 'Blind mode — name the room from behaviour alone',
-    credit: 'First built in 2017 by <a href="https://twitter.com/arjunsriv">@arjunsriv</a>.',
+    credit:
+      'First built in 2017 by <a href="https://twitter.com/arjunsriv">@arjunsriv</a> — ' +
+      '<a href="legacy/">play that original</a>.',
     rule: 'Every round ran the same kind of rule, and it was fixed — it just was not fixed in the way the word suggests. Each one placed the reward from a smoothed estimate of your next tap. The only thing it read was you.',
     switched: (rate: number, pct: number) =>
       rate > 0.58
@@ -89,6 +91,7 @@ export const COPY = {
     hidden: 'Belief hidden — the environment as the paper defines it.',
     memory: 'Memory — low remembers everything, high only your last tap',
     blind: 'Blind mode',
+    original: 'The 2017 original',
   },
   blind: {
     ask: 'Friend, foe, or neither?',

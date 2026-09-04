@@ -305,7 +305,21 @@ button.ghost {
   font-family: var(--mono); font-weight: 400; font-size: 12px; letter-spacing: 0.06em;
   padding: 14px; min-height: 44px;
 }
-button.ghost:hover { color: var(--ink); border-color: var(--ink); }
+button.ghost:hover, a.ghost:hover { color: var(--ink); border-color: var(--ink); }
+
+/* The link out to the 2017 build wears the same clothes as a ghost button. */
+a.ghost {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  padding: 14px;
+  min-height: 44px;
+}
 button:disabled { opacity: 0.4; cursor: default; }
 
 .cards { display: flex; flex-direction: column; gap: 9px; }

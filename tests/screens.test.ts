@@ -272,3 +272,14 @@ describe('the replay figure', () => {
     expect(node.querySelector('.sub')!.textContent).toContain('Tap 5');
   });
 });
+
+describe('the 2017 original', () => {
+  it('is reachable from the debrief and from the lab', () => {
+    // The build ships legacy/ alongside dist/; these are the only two ways in,
+    // and a refactor has already dropped a link out of the lab once.
+    const href = (s: Session, build: (s: Session, a: Actions) => Screen) =>
+      [...build(s, actions()).node.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(href(played('debrief'), screens.debrief)).toContain('legacy/');
+    expect(href(played('lab'), screens.lab)).toContain('legacy/');
+  });
+});

@@ -414,6 +414,7 @@ export function lab(s: Session, a: Actions): Screen {
       ],
       controls: [
         el('button', { class: 'ghost', type: 'button', onclick: () => a.startBlind() }, COPY.lab.blind),
+        el('a', { class: 'ghost', href: 'legacy/' }, COPY.lab.original),
       ],
     },
     () => rows.set(s.rounds()),

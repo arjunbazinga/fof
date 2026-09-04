@@ -86,5 +86,12 @@ MIT. See [LICENSE](LICENSE).
 
 ## `legacy/`
 
-The original 2017 build, kept as it shipped: one `index.html`, a hand-maintained
+The original 2017 build, still playable at
+**[/fof/legacy/](https://arjunbazinga.github.io/fof/legacy/)** — linked from the
+debrief and from the lab, and it links back. One `index.html`, a hand-maintained
 `fof.min.js`, and 156 KB of Chart.js to draw a ±1 line.
+
+It ships as it was, with one exception: the Google Analytics snippet was removed
+when it was archived. The property is on a sunset Google product and collects
+nothing, so it was a third-party request for no return. Git history has the
+original bytes.
