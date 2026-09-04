@@ -73,18 +73,12 @@ third-party requests, and nothing is collected about you: the only thing stored
 is a flag saying you have played before, so a repeat visit can offer to skip
 the intro.
 
-## What it is for
+## Why it exists
 
-[`docs/product.md`](docs/product.md) is the decision record — the goal, the
-measure and its target band, the non-goals, and the rule that governs every
-line of copy shown before the reveal. Read it before changing a beat.
-
-The short version: **a person should come away knowing how little an agent is
-given to work with — by being given exactly that much themselves, and noticing
-how fast, or how slowly, they learn from it.** The friend-or-foe feedback loop
-is what happens to be hard to learn in this particular room; it is an instance,
-not the point. A change that makes this more fun, more faithful, or more
-beautiful while weakening that sentence is a bad change.
+[`docs/why.md`](docs/why.md) — short. The gist: these environments are small
+enough to play, so you can find out how little an agent is given to work with
+by being given that much yourself. Worth reading before changing any copy the
+player sees before the reveal.
 
 ## Licence
 
