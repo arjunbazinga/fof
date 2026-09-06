@@ -7,25 +7,25 @@
 
 @font-face {
   font-family: 'Plex Sans';
-  src: url('/fof/fonts/plex-sans.woff2') format('woff2-variations');
+  src: url('../fonts/plex-sans.woff2') format('woff2-variations');
   font-weight: 100 700;
   font-display: swap;
 }
 @font-face {
   font-family: 'Plex Mono';
-  src: url('/fof/fonts/plex-mono-400.woff2') format('woff2');
+  src: url('../fonts/plex-mono-400.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: 'Plex Mono';
-  src: url('/fof/fonts/plex-mono-600.woff2') format('woff2');
+  src: url('../fonts/plex-mono-600.woff2') format('woff2');
   font-weight: 600;
   font-display: swap;
 }
 @font-face {
   font-family: 'Bricolage';
-  src: url('/fof/fonts/bricolage.woff2') format('woff2-variations');
+  src: url('../fonts/bricolage.woff2') format('woff2-variations');
   font-weight: 700 800;
   font-display: swap;
 }
