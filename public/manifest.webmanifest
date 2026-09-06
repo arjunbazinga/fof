@@ -2,14 +2,22 @@
   "name": "Friend or Foe",
   "short_name": "Friend or Foe",
   "description": "A two-box game where the other player is reading you.",
-  "start_url": "/fof/",
-  "scope": "/fof/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#edefea",
   "theme_color": "#edefea",
   "icons": [
-    { "src": "/fof/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "/fof/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
   ]
 }

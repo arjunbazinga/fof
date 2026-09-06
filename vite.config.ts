@@ -21,9 +21,10 @@ function buildStamp(): Plugin {
   };
 }
 
-// Served from https://arjunbazinga.github.io/fof/
+// Relative base: the site works wherever it is mounted -- a project path like
+// /fof/, a domain root, anywhere -- so the deployment target cannot break it.
 export default defineConfig({
-  base: '/fof/',
+  base: './',
   plugins: [buildStamp()],
   build: {
     target: 'es2020',
