@@ -6,7 +6,7 @@
   "description": "A playable version of the Friend or Foe environment from AI Safety Gridworlds.",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.22.2"
   },
   "scripts": {
     "dev": "vite",
