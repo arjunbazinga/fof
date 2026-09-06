@@ -11,6 +11,7 @@
     <meta name="theme-color" content="#edefea" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#101311" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="build" content="__BUILD__" />
     <!-- Static site, no user input and no third-party origins: lock it down. -->
     <meta
       http-equiv="Content-Security-Policy"
@@ -33,8 +34,39 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@arjunsriv" />
   </head>
+    <style>
+      /*
+        Shown only if the app never mounts. It sits inside #app and the first
+        render replaces it, so a working page never flashes it -- and a broken
+        one says something instead of going blank. Inline so it survives the
+        stylesheet failing too.
+      */
+      .boot {
+        opacity: 0;
+        animation: boot-show 1ms linear 1.5s forwards;
+        max-width: 30em;
+        margin: 4em auto;
+        padding: 0 1.2em;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #5b6560;
+      }
+      @keyframes boot-show { to { opacity: 1; } }
+      .boot b { color: #111518; }
+      @media (prefers-color-scheme: dark) {
+        .boot { color: #8b958c; }
+        .boot b { color: #e9ece4; }
+      }
+    </style>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <p class="boot">
+        <b>Friend or Foe didn’t start.</b><br />
+        Pull down to refresh — an older copy of this page may be cached.<br />
+        If it keeps happening, the build is <b>__BUILD__</b>; send that along.
+      </p>
+    </div>
     <noscript>
       <p style="font-family: system-ui; max-width: 34em; margin: 3em auto; padding: 0 1em">
         Friend or Foe is a game about a hidden player that predicts your next move from your last few
